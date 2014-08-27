@@ -1,0 +1,3 @@
+Q: Why can I not see files listed for a backup?
+
+A: The dstore and all sub-directories/files need to conhtain the same user permissions as the apache server allows. This will be fixed in future versions. 
