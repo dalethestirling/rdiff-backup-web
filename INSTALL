@@ -1,0 +1,118 @@
+rdiff-backup-web
+
+a web front-end for rdiff-backup
+
+(c) 2007/2008 Dale Stirling/David Evans (rdiffbackupweb@puredistortion.com)
+
+Useless without rdiff-backup (c) Ben Escoto (bescoto@stanford.edu)
+
+INSTALLATION & USE
+==================
+
+Make sure you have rdiff-backup installed and working as per the instructions on www.nongnu.org/rdiff-backup. Also, if you want to use the SSH method of backup, you will need to follow the instructions for unattended backups from Dean Gaudet found at http://arctic.org/~dean/rdiff-backup/unattended.html.
+
+Also you will need python and the MySQLdb module installed. 
+
+Setup is a bit more straightforward now.
+
+1. 	Untar the package into a web-accessible folder
+	The folder could be anything from /var/www/html to ~/public_html.
+	The best way to untar the package will be tar -zxvf rdiff-backup-web-(version no).tar.gz
+	Copy process_backups.pl to /etc/cron.daily for daily backups
+
+2.	Set up the database
+	First, you need to create the database itself, so log in to mysql as root and issue the command:
+		create database rdiffbackupweb;
+	Then you need to allow access to the tables in the database using:
+		grant all on rdiffbackupweb.* to backup_user identified by "password";
+	Then quit mysql, and find the backup.sql file. At the command line, type
+		mysql -u backup_user -p rdiff-backup-web < ./rdiff.sql
+	It will ask you for the password, then create the tables required.
+
+4.	Change the config settings
+	In config.php change any paths that are required and fill in the details to connect to your database. Ensure that any of the directories that you specify are accessable to the user apache is running as.
+	
+5.	Start using the system
+	The URL of the installation should be something like http://www.server.com/rdiff-backup-web/. Check that you get the login screen.
+	You need to set up some backups and users before you can log in. Login as username=admin, password=admin and enter the Administration link (at the bottom of the page). Here you need to set up users and passwords, add backups, and then give your users access to individual backups
+	When you are adding a backup, you just need the following:
+		- Path to orig files: 	this is the server/share that you are connecting to, eg //server/d$
+		- Path to backup:	Just give a name. The system will create a directory in your datastore. Given the above example, i would choose server_d. If you use a leading slash, you can now use alternate locations by giving an absolute path (/mnt/usb for a usb drive for example)
+		- --include string:	leave blank if you want everything. put in a list of directory names (case sensitive!) if you only want to backup certain directories, with ;'s between them
+		- --exclude string:	similar to above. put in ** to exclude everything except what has been specificially included.
+		- Time to keep for:	the process_backups script clears out backups older than whatever you specify here. Something like "2W" is 2 weeks. See the rdiff-backup docs for other options
+		- Connection Type:      Drop down box to choose either samba or SSH.
+		- Mount options:	This is the samba mounting options you would normally use to mount the share provided above. it will take the form "-t smbfs -o username=username,password=password,ro". The ro is not strictly necessary, but you might as well connect read only, because you won't be writing anything to the share. Leave this empty when using SSH.
+		- Active:		Leave this as 1, switching to 0 will stop the backup being processed.
+
+	The options should be fairly straightforward if you are at all familiar with mounting samba shares and rdiff-backup. If you get them wrong, it is easy to edit each entry simply by clicking on the id number. Here, the options will be expanded to their full values.
+
+6.	From the user's prospective
+	When a user logs in, they are presented with a list of buttons, each relating to a backed-up drive. 
+	Clicking on one brings up a list of directorys in that backup (now with images. *FIVE* of them!)
+	There is a drop-down box at the top to select the age of the files. 
+	Clicking on a link expands the directory. 
+	Now you have 3 options:
+		Clicking on the "-" beside the folder collapses the directory
+		Clicking on the directory name prepares the entire folder and all subdirectories within it for download and opens the download page.
+		Clicking on a filename within the directory opens the download page.
+	(In the background, the program has copied the file(s) into the web-accessible tmp folder)
+	You can now download the file through your browser.
+
+TODO
+====
+
+This is just a grep of the TODOs from the source code, in direct violation of Microsoft's patent.
+
+WEB INTERFACE:
+TODO: Redo prepare_backup so that when you click on the link, it opens a new page which then starts the download, like download.com et al. This might let us gracefully remove the file once download is complete.
+TODO: add an "Are you sure" question to process_delete_backup. Javascript maybe?
+TODO: Allow deletion of users from add_user
+TODO: Function breaks page as variables not passed to function. Temp fix redirect to Admin menu.
+TODO: Add a javascript "Are you Sure?" before process_delete_access
+TODO: Function breaks page as variables not passed to function. Temp fix redirect to Admin menu.
+
+PROCESS_BACKUP:
+TODO: Reporting mounting, backup stats ect.
+TODO: Offsite PUSH job.
+
+RELEASE HISTORY
+===============
+0.07	Fixed the things that I broke in 0.07, thinking I uploaded a dud version instead of release without realizing.
+
+0.07	Tidied up some bugs and stuff and made this release a far more usable version.
+
+0.05	Rewritten process_backup script in Python
+	Fixed bugs in web interface.
+	Removed dependancy on CPAN module PHP::Include
+	Added NFS support.
+
+0.04	Added the possibility of carrying out SSH/local backups
+	Prettified the file list.
+	Cleared a few of the todos.
+	Uses PHP::Include to simplify setting up the variables.
+	Lots of bug fixes (this one might actually work...)
+
+0.03	Added some semblance of security by using cookies.
+
+0.02	The "Don't ask me" release.
+	Gone and totally forgotten. I lost it in Sourceforge somewhere.
+
+0.01	Original Release
+	ALPHA
+
+CREDITS
+=======
+
+Thanks of course to:
+Firstly David Evans, the creator of this web ui. 
+Ben Escoto and the community surrounding rdiff-backup, 
+The writers of and community surrounding SME Server, who's distribution is the perfect companion to rdiff-backup-web.
+"You most likely know it as SME Server, but it will always be E-Smith to me. Bonne chance, Elaine. (to a passerby) You there on the motorbike! Sell me one of your melons! (runs after him)"
+Written entirely using Vim
+Images created using the Gimp (God bless the gimp...)
+
+COPYRIGHT
+=========
+
+Copyright (c) 2007/2008 Dale Stirling/David Evans. All rights reserved. This program is free software and is released under the GNU General Public Licence. See LICENCE for details.
