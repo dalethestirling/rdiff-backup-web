@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Rdiff-backup-web</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Loading Bootstrap -->
+    <link href={{ url_for('static', filename='css/bootstrap.css') }} rel="stylesheet">
+
+    <!-- Loading Flat UI -->
+    <link href={{ url_for('static', filename='css/flat-ui.css') }} rel="stylesheet">
+
+    <!-- Loading Additional login page CSS -->
+    <link href={{ url_for('static', filename='css/login.css') }} rel="stylesheet">
+
+    <!-- <link rel="shortcut icon" href="images/favicon.ico"> -->
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements. All other JS at the end of file. -->
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.js"></script>
+      <script src="js/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+          <h1 class="text-center">rdiff-backup-web</h1>
+        </div>
+      </div>
+      <div class="row top-row-form">
+        <div class="alert alert-success" role="alert">You were logged out!</div>
+        <div class="alert alert-danger" role="alert">Oh snap and its a stolen password</div>
+        <div class="col-md-6 col-md-offset-3">
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <form role="form">
+                <div class="form-group">
+                  <input type="text" class="form-control flat" id="exampleInputEmail1" placeholder="Enter Username">
+                </div>
+                <div class="form-group">
+                  <input type="password" class="form-control flat" id="exampleInputPassword1" placeholder="Password">
+                </div>
+                <button type="submit" class="btn btn-default">Login</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

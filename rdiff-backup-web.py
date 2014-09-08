@@ -1,15 +1,17 @@
 import flask
+import flask_login
 
 # Move to blitzdb
 USERNAME = 'admin'
 PASSWORD = 'admin'
+DEBUG=True
 
 app = flask.Flask(__name__)
 # remove with db implementation 
 app.config.from_object(__name__)
 
 def logged_in():
-    return True
+    return False
 
 def is_admin():
     return True
@@ -48,7 +50,7 @@ def logout():
 def index():
     if not logged_in(): 
         error = 'You must be logged in!'
-        return render_template('login.html', error=error)
+        return flask.render_template('login.html', error=error)
 
     # Is admin
 
@@ -57,9 +59,9 @@ def index():
     # Expose admin tab if user exists
 
     # Render template
-    return 'index'
+    return flask.render_template('base.html')
 
-@app.route('/backup/<name>'):
+@app.route('/backup/<name>')
 def backup(name):
     # valid user for backup and logged in
 
@@ -68,16 +70,18 @@ def backup(name):
     # Get increments
 
     # Render Template 
-    return 'backup: %s' % str(name)
+    backup = 'backup: %s' % str(name)
+
+    return flask.render_template('backup.html', backup=backup)
 
 @app.route('/backup/<name>/<increment>')
 def backup_increment(name, increment):
     # valid user for backup and logged in
 
     # Get backup file tree
-     
+
     # List file tree in template.
-    return 'increment: %s of backup: %s' % (str(name), str(increment))
+    return 'increment: %s of backup: %s' % (str(increment), str(name))
 
 @app.route('/admin')
 def admin_panel():
@@ -92,3 +96,6 @@ def admin_panel():
         # Render template
         return 'admin'
 
+# application execution 
+if __name__ == '__main__': 
+    app.run()
