@@ -1,57 +1,78 @@
 import flask
+import flask_blitzdb
 import flask_login
+import config.model as model
 
 # Move to blitzdb
 USERNAME = 'admin'
 PASSWORD = 'admin'
+BLITZDB_DATABASE = r'./rdiff-backup-web.db'
 DEBUG=True
 
 app = flask.Flask(__name__)
 # remove with db implementation 
 app.config.from_object(__name__)
 
-def logged_in():
-    return False
+# Set secret key
+app.secret_key = '1234'
 
-def is_admin():
-    return True
+# Setup the db 
+db = flask_blitzdb.BlitzDB(app)
 
-@app.before_request
-def before_request():
-    # init blitzdb here 
-    pass
+# flask login setup
+login_manager = flask_login.LoginManager()
+login_manager.init_app(app)
 
-@app.teardown_request
-def teardown_request(exception):
-    # close blitzdb 
-    pass
+@login_manager.user_loader
+def load_user(userid):
+    try:
+        conn = db.connection
+        return conn.get(model.Users, {'id': userid})
+    except:
+        return None
+
+def hash_password(password):
+    return password
+
+def authenticate_user(username, password):
+    try:
+        conn = db.connection
+        user_obj = conn.get(model.Users, {'name': username})
+        if hash_password(password) == user_obj['password']:
+            return user_obj
+        else: 
+            return None
+    except:
+        return None
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     error = None
-    if request.method == 'POST':
-        if request.form['username'] != app.config['USERNAME']:
-            error = 'Invalid username'
-        elif request.form['password'] != app.config['PASSWORD']:
-            error = 'Invalid password'
-        else:
-            session['logged_in'] = True
-            flash('You were logged in')
-            return redirect(url_for('show_entries'))
-    return render_template('login.html', error=error)
+    if flask.request.method == 'POST':
 
-@app.route('/logout')
-def logout():
-    session.pop('logged_in', None)
-    flash('You were logged out')
-    return redirect(url_for('show_entries'))
+        user_auth = authenticate_user(
+            flask.request.form['username'], 
+            flask.request.form['password']
+        )
+
+        if not user_auth:
+            error = 'Invalid user or password'
+        else:
+            flask_login.login_user(user_auth)
+            flask.flash('You were logged in')
+            return flask.redirect(url_for('index'))
+
+    return flask.render_template('login.html', error=error)
+
+# @app.route('/logout')
+# def logout():
+#     session.pop('logged_in', None)
+#     flash('You were logged out')
+#     return redirect(url_for('show_entries'))
 
 @app.route('/')
+@flask_login.login_required
 def index():
-    if not logged_in(): 
-        error = 'You must be logged in!'
-        return flask.render_template('login.html', error=error)
-
     # Is admin
 
     # Get Backups for user  
@@ -83,18 +104,18 @@ def backup_increment(name, increment):
     # List file tree in template.
     return 'increment: %s of backup: %s' % (str(increment), str(name))
 
-@app.route('/admin')
-def admin_panel():
-    # Validate if admin user
-    if not is_admin:
-        abort(401)
+# @app.route('/admin')
+# def admin_panel():
+#     # Validate if admin user
+#     if not is_admin:
+#         abort(401)
     
-    if request.method == 'POST':
-        # Process action
-        return 'admin post' 
-    else:
-        # Render template
-        return 'admin'
+#     if request.method == 'POST':
+#         # Process action
+#         return 'admin post' 
+#     else:
+#         # Render template
+#         return 'admin'
 
 # application execution 
 if __name__ == '__main__': 
