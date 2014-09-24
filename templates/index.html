@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content%}
+<p>
+  <h4>Rdiff-Backup Server: {{ hostname }}</h4>
+</p> 
+<br />
+<div class="panel panel-default"> 
+  <!-- Default panel contents -->
+  <div class="panel-heading">Backups assigned to: <strong>{{ username }}</strong></div>
+
+    <!-- Table -->
+    <table class="table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Source</th>
+          <th>Keep For</th>
+          <th>Active</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for backup in backups %}
+        <tr>
+          <td>{{ backup['seq'] }}</td>
+          <td><a href="/backup/{{ backup['name'] }}">{{ backup['name'] }}</a></td>
+          <td>{{ backup['type'] }}</td>
+          <td>{{ backup['source_dir'] }}</td>
+          <td>{{ backup['keep_for'] }}</td>
+          <td>{{ backup['active'] }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,6 @@
+{
+	"DB_PATH": "./rdiff-backup-web.db",
+	"BACKUP_STORE_DIR": "dstore",
+	"MOUNT_TEMP_DIR": "mnt",
+	"DOWNLOAD_LOCATION": "tmp"
+}
